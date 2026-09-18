@@ -1,0 +1,56 @@
+name: Deploy Logseq Web to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Déclenche le build à chaque push sur la branche principale
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps: deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Clone Logseq Official Repo
+        run: git clone https://github.com logseq-src
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-cache: 'yarn'
+          cache-dependency-path: logseq-src/yarn.lock
+
+      - name: Install Yarn globally
+        run: npm install -g yarn
+
+      - name: Build Logseq Web
+        run: |
+          cd logseq-src
+          yarn install --frozen-lockfile
+          yarn build:web
+          mv static ../public
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './public'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
