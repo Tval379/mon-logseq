@@ -30,15 +30,19 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-cache: 'yarn'
+          node-version: 20
+          cache: 'yarn'
           cache-dependency-path: logseq-src/yarn.lock
 
-      - name: Install Yarn globally
-        run: npm install -g yarn
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Build Logseq Web
-        run: | 
-          cd logseq-src
+        working-directory: logseq-src
+        env:
+          # Force Corepack à ignorer la spécification malformée du package.json amont
+          COREPACK_ENABLE_PROJECT_SPEC: 0
+        run: |
           yarn install --frozen-lockfile
           yarn build:web
           mv static ../public
