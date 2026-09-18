@@ -24,13 +24,29 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Clone Logseq Official Repo
-        run: git clone https://github.com/logseq/logseq.git logseq-src
+      - name: Clone and Pin Logseq Official Repo
+        run: |
+          git clone https://github.com/logseq/logseq.git logseq-src
+          cd logseq-src
+          git checkout 0.10.9
 
-      - name: Setup Node.js
+      # Installation des dépendances natives requises pour compiler les modules comme Canvas/Pixman
+      - name: Install Native Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pkg-config \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libjpeg-dev \
+            libgif-dev \
+            librsvg2-dev \
+            libpixman-1-dev
+
+      - name: Setup Node.js (Node 20)
         uses: actions/setup-node@v4
         with:
-          node-version: 24 # Utilisation directe de la version moderne requise sans configuration de cache
+          node-version: 20 # La version 0.10.9 est optimisée pour Node 20
 
       - name: Enable Corepack
         run: corepack enable
