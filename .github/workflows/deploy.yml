@@ -19,7 +19,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Fixé sur une version stable pour éviter les ruptures de build d'ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -27,12 +27,12 @@ jobs:
       - name: Clone Logseq Official Repo
         run: git clone https://github.com/logseq/logseq.git logseq-src
 
-      - name: Setup Node.js
+      - name: Setup Node.js (Node 24)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24 # Passage à Node 24 pour supprimer l'avertissement de dépréciation
           cache: 'yarn'
-          cache-dependency-path: logseq-src/yarn.lock
+          cache-dependency-path: logseq-src/yarn.lock # Le fichier existe maintenant car le clone a été fait avant !
 
       - name: Enable Corepack
         run: corepack enable
@@ -40,8 +40,7 @@ jobs:
       - name: Build Logseq Web
         working-directory: logseq-src
         env:
-          # Force Corepack à ignorer la spécification malformée du package.json amont
-          COREPACK_ENABLE_PROJECT_SPEC: 0
+          COREPACK_ENABLE_PROJECT_SPEC: 0 # Ignore la configuration malformée du package.json amont
         run: |
           yarn install --frozen-lockfile
           yarn build:web
