@@ -58,7 +58,7 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           yarn build:static
-          test -d static
+          yarn release-app
           mv static ../public
 
       - name: Setup Pages
