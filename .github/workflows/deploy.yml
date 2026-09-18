@@ -57,7 +57,8 @@ jobs:
           COREPACK_ENABLE_PROJECT_SPEC: 0
         run: |
           yarn install --frozen-lockfile
-          yarn build:web
+          yarn build:static
+          test -d static
           mv static ../public
 
       - name: Setup Pages
