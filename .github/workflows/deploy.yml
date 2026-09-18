@@ -18,14 +18,14 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps: deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Clone Logseq Official Repo
-        run: git clone https://github.com logseq-src
+        run: git clone https://github.com/logseq/logseq.git logseq-src
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -37,7 +37,7 @@ jobs:
         run: npm install -g yarn
 
       - name: Build Logseq Web
-        run: |
+        run: | 
           cd logseq-src
           yarn install --frozen-lockfile
           yarn build:web
